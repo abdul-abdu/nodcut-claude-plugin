@@ -17,11 +17,23 @@ Deploying the same name again replaces the site and starts a new year.
 
 ## Good to know
 - Only static sites are supported: HTML, CSS, JS and images. Nothing runs on a server
-- Works in Claude Code. Claude runs `curl` and `tar` (built into macOS, Linux and Windows 10+) and asks your permission first. Nothing gets installed
+- **Works everywhere through the NodCut connector:** Claude chat (web, desktop, mobile), Cowork and Claude Code. The first time, Claude asks you to connect NodCut. A NodCut page opens, where you sign in with Telegram or Google and click Allow
+- **Big sites from Claude Code:** sites over 4 MB, or with many photos, can also be published from Claude Code without the connector. Claude runs `curl` and `tar` (built into macOS, Linux and Windows 10+) and asks your permission first
 - The service is run by NodCut (nodcut.com), not by Anthropic
 
 ## What the plugin runs, sends and stores
-The plugin is only instructions for Claude (`skills/*/SKILL.md`). The commands Claude runs are written out in those files.
+The plugin is instructions for Claude (`skills/*/SKILL.md`) plus one remote connector, NodCut's MCP server at `https://mcp.nodcut.com/mcp` (declared in `plugin.json`). The plugin contains no code. Any commands Claude runs are written out in the skill files.
+
+**Through the connector (`https://mcp.nodcut.com`):**
+- **Connecting:** standard OAuth. You sign in on `app.nodcut.com` and click Allow. Claude then holds your NodCut session (valid 30 days) to call the connector's tools
+- **Tools:**
+  - `check_site_name`: sends a name
+  - `publish_site`: sends the site's files, the name and your language, and returns the Payme link
+  - `get_publish_status`: sends a deploy id
+  - `list_my_sites`: sends nothing
+- **Never sent:** the connector never sees your other chats, files or photos, only what Claude passes to these tools
+
+**Through commands, in Claude Code only:**
 
 **Sent to NodCut's API, `https://api.nodcut.com/sites`:**
 - **Sign-in:** a request for a one-time sign-in code, then a check every 2 seconds until you approve it

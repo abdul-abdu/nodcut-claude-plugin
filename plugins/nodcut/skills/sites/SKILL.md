@@ -5,7 +5,9 @@ description: "List the user's websites on nodcut.com with their addresses and th
 
 # The user's nodcut.com sites
 
-Run:
+If the NodCut connector's `list_my_sites` tool is available, call it and show the result as a short list.
+
+Otherwise, in Claude Code, run:
 ```bash
 T=~/.config/nodcut/token; if [ -s "$T" ]; then curl -sS https://api.nodcut.com/sites/sites -H "Authorization: Bearer $(cat "$T")" -w '\nHTTP %{http_code}\n'; else echo NOT_SIGNED_IN; fi
 ```

@@ -13,10 +13,19 @@ The user may not be technical:
 
 Arguments: `$ARGUMENTS`. They may hold the name, the site folder, both or neither.
 
-Everything below runs with the Bash tool, using `curl` and `tar`, which macOS, Linux and Windows 10+ all have. Set the Bash timeout to 600000 ms on the commands that wait.
+## Two ways to publish
+1. **The NodCut connector (preferred).** Use it when its tools are available: `check_site_name`, `publish_site`, `get_publish_status`, `list_my_sites`. It works everywhere, in chat, Cowork and Claude Code:
+   1. Pick the name (section 2), and check it with `check_site_name`
+   2. Call `publish_site` with every file of the site: `index.html` at the top, plus CSS, JS, other pages and images. Use paths from the site root, text as `utf8` and binary files as `base64`. Pass the user's `language` (`uz`, `ru` or `en`)
+   3. Give the user the `pay_url` exactly as returned, and tell them it costs 15 000 so'm, paid on Payme
+   4. Call `get_publish_status` with `wait_seconds: 20`, again and again, until it says `published`. Then give the address and the end of the paid year
+   5. If a tool says the user isn't connected, tell them to connect NodCut: click Connect, then Allow on the NodCut page that opens
+   6. If the site is over 4 MB, or has photos you can't send as base64, use the second way instead, when you can run commands
+2. **Commands, in Claude Code only.** Use them when the connector isn't available or the site is too big for it. Sections 3–5 below run with the Bash tool, using `curl` and `tar`, which macOS, Linux and Windows 10+ all have. Set the Bash timeout to 600000 ms on the commands that wait.
 
-## 1. Find the built site
-The site must be static: files a browser opens without a server.
+## 1. Find the site
+In chat, the site is the files you just wrote (HTML, CSS, JS) for the user.
+In Claude Code or Cowork, it is a folder. The site must be static: files a browser opens without a server.
 - **Needs a server** (API routes, server-side rendering, PHP, a database): say nodcut.com hosts only static sites, and stop. If the framework has a static export, offer it (Next.js: `output: "export"`)
 - **Has a build step:** if `package.json` has a `build` script and there is no fresh build output, run the build with the project's package manager
 - **The site folder** is the folder with `index.html` at its top: usually `dist/`, `build/`, `out/` or `_site/`, or the project folder itself for a hand-written site

@@ -1,8 +1,8 @@
 {
   "name": "nodcut",
   "displayName": "NodCut",
-  "version": "0.2.0",
-  "description": "Publish a static website to <name>.nodcut.com from Claude Code. 15 000 so'm per deploy with Payme, live for one year.",
+  "version": "0.3.0",
+  "description": "Publish the websites you make with Claude to <name>.nodcut.com. 15 000 so'm per publish with Payme, live for one year.",
   "author": {
     "name": "NodCut",
     "url": "https://nodcut.com"
@@ -20,5 +20,11 @@
   ],
   "privacyPolicyUrl": "https://nodcut.com/privacy.html",
   "termsOfServiceUrl": "https://nodcut.com/terms.html",
-  "supportUrl": "https://t.me/NodCutBot"
+  "supportUrl": "https://t.me/NodCutBot",
+  "mcpServers": {
+    "nodcut": {
+      "type": "http",
+      "url": "https://mcp.nodcut.com/mcp"
+    }
+  }
 }
