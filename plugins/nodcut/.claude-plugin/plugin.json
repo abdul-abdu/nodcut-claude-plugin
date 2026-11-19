@@ -1,5 +1,6 @@
 {
   "name": "nodcut",
+  "displayName": "NodCut",
   "version": "0.2.0",
   "description": "Publish a static website to <name>.nodcut.com from Claude Code. 15 000 so'm per deploy with Payme, live for one year.",
   "author": {
@@ -10,5 +11,14 @@
   "repository": "https://github.com/abdul-abdu/nodcut-claude-plugin",
   "license": "MIT",
   "icon": ".claude-plugin/icon.png",
-  "keywords": ["deploy", "hosting", "static-site", "payme", "uzbekistan"]
+  "keywords": [
+    "deploy",
+    "hosting",
+    "static-site",
+    "payme",
+    "uzbekistan"
+  ],
+  "privacyPolicyUrl": "https://nodcut.com/privacy.html",
+  "termsOfServiceUrl": "https://nodcut.com/terms.html",
+  "supportUrl": "https://t.me/NodCutBot"
 }
