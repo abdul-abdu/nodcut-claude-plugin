@@ -1,6 +1,6 @@
 # Sites API contract
 
-The plugin (`plugins/nodcut/scripts/nodcut.mjs`) and the sites stack (`nodcut/backend/sites/`) both follow this file.
+The plugin's skills (`plugins/nodcut/skills/`) and NodCut's backend both follow this file.
 Base URL: `https://api.nodcut.com/sites`. Can be changed with `NODCUT_API_URL`.
 
 - **Auth:** `Authorization: Bearer <session token>`. This is the same 30-day session the web app uses, checked by the shared stack's authorizer
@@ -35,7 +35,13 @@ Allowing hands the CLI the approving browser's own 30-day session token (`Bearer
 
 ## Deploys
 
-### `POST /deploys` (auth)
+### `POST /deploys` (auth): the whole site as one archive (what the plugin uses)
+`{ name, archive: true }`
+→ `201 { deploy_id, upload: { url, headers } }`
+- `url`: one presigned `PUT` for the site as a `.tar.gz`, sent with `Content-Type: application/gzip`. The archive may hold the site's files at its top, or under one folder
+- On `/uploaded`, the server unpacks it and skips hidden files and folders and `node_modules`. It then checks the files as below (`no_index`, `too_large`, `invalid_files`)
+
+### `POST /deploys` (auth): file by file
 `{ name, files: [{ path, size }] }`
 - `path`: relative, with `/` separators, no `..`
 → `201 { deploy_id, uploads: [{ path, url, headers }] }`
@@ -49,7 +55,7 @@ Errors:
 
 ### `POST /deploys/{id}/uploaded` (auth), body `{ lang? }` (`uz` by default, for the Payme page)
 The server checks that every file is in staging, then opens a Payme order (`kind: "site"`).
-→ `200 { pay_url, amount_uzs, order_id }`
+→ `200 { pay_url, amount_uzs, order_id, files }` (`files`: how many files will be published)
 - `400 missing_files { message, files: [...] }`
 
 ### `GET /deploys/{id}` (auth)

@@ -1,15 +1,16 @@
 ---
 name: sites
-description: "List the user's sites on nodcut.com with their addresses and the date each is paid until. Use when the user asks which sites they have on nodcut.com or when one expires. Usage: /nodcut:sites."
-allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/nodcut.mjs *)
+description: "List the user's websites on nodcut.com with their addresses and the date each is paid until. Use when the user asks which sites they have on nodcut.com or when one expires. Usage: /nodcut:sites."
 ---
 
 # The user's nodcut.com sites
 
-1. Run `node ${CLAUDE_PLUGIN_ROOT}/scripts/nodcut.mjs sites`. If `${CLAUDE_PLUGIN_ROOT}` was not filled in, look under `~/.claude` for `**/plugins/nodcut/scripts/nodcut.mjs`
-2. Show the result as a short list: the address and the date it is paid until
-3. A site is deleted when its year runs out. Deploying it again with `/nodcut:deploy` starts a new year from that day
-4. On exit `2`, the user isn't signed in:
-   1. Run `node ${CLAUDE_PLUGIN_ROOT}/scripts/nodcut.mjs login` with the Bash timeout set to 600000 ms
-   2. Tell the user to sign in in the browser and click **Allow**
-   3. Then list the sites again
+Run:
+```bash
+T=~/.config/nodcut/token; if [ -s "$T" ]; then curl -sS https://api.nodcut.com/sites/sites -H "Authorization: Bearer $(cat "$T")" -w '\nHTTP %{http_code}\n'; else echo NOT_SIGNED_IN; fi
+```
+
+- **`HTTP 200`:** show each site in `sites` as a short list, in the user's language: the `url`, and the date in `expires_at`, which is the end of its paid year. A site is deleted when its year runs out, and publishing it again with `/nodcut:deploy` adds a year
+- **`NOT_SIGNED_IN`, `HTTP 401` or `HTTP 403`:** sign in first (`/nodcut:login`), then list again
+
+Never print or show the token.

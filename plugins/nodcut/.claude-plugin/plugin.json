@@ -1,6 +1,6 @@
 {
   "name": "nodcut",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Publish a static website to <name>.nodcut.com from Claude Code. 15 000 so'm per deploy with Payme, live for one year.",
   "author": {
     "name": "NodCut",
