@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "nodcut",
+  "description": "NodCut plugins for Claude Code",
+  "owner": {
+    "name": "NodCut"
+  },
+  "plugins": [
+    {
+      "name": "nodcut",
+      "description": "Publish a static website to <name>.nodcut.com. 15 000 so'm per deploy with Payme, live for one year.",
+      "category": "deployment",
+      "source": "./plugins/nodcut"
+    }
+  ]
+}
