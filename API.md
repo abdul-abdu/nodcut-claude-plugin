@@ -57,12 +57,16 @@ Errors:
 ### `POST /deploys/{id}/uploaded` (auth), body `{ lang? }` (`uz` by default, for the Payme page)
 Before the payment opens, every text file is checked. Fields for card numbers, CVV or SMS codes, a password field on a page naming a bank or payment service, and secrets (bot tokens, API keys, private keys) are refused with `400 { error: "unsafe_content", message, file, reason }`, where `reason` is `card_fields`, `password_phishing` or `secret`
 The server checks that every file is in staging, then decides what the deploy is:
-- **`publish`:** a new site, or a name whose site expired. Opens a Payme order for the `site` pack (15 000 so'm, a year)
-- **`renew`:** `renew: true` on a live site the caller owns. The same order; the year is added to the current end
-- **`update`:** a live site the caller owns. Takes `cost_credits` (4) from the NodCut balance at once and starts publishing; the end date stays. When the balance is short, opens a Payme order for the `basic` pack (50 credits, 12 500 so'm) and spends the 4 once it is paid
+- **`publish`:** a new site, or a name whose site expired: a year, `cost_credits` 60
+- **`renew`:** `renew: true` on a live site the caller owns: a year added to the current end, 60 credits
+- **`update`:** a live site the caller owns: new files, the end date stays, `cost_credits` 4
+
+When the NodCut balance holds `cost_credits`, they are taken at once and publishing starts. Otherwise it opens a Payme order: the `site` pack (15 000 so'm) for a year, or the `basic` pack (50 credits, 12 500 so'm) for an update, which spends the 4 once it is paid
 
 → `200 { kind, pay_url, amount_uzs, order_id, cost_credits, pack_credits?, files }` while a payment is due (`files`: how many files will be published)
-→ `200 { kind: "update", state: "paid", cost_credits, balance, files }` for an update paid from the balance
+→ `200 { kind, state: "paid", cost_credits, balance, files }` when it was paid from the balance
+
+### `GET /names/{name}` also gives `balance` (the caller's credits) and `year_credits` (60), and for the caller's own live site `yours`, `expires_at`, `update_credits` and `renew_uzs`
 - `400 missing_files { message, files: [...] }`
 
 ### `GET /deploys/{id}` (auth)

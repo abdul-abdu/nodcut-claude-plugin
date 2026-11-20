@@ -1,6 +1,6 @@
 ---
 name: deploy
-description: "Publish a static website (HTML, CSS, JS, images) the user built to its own address, https://<name>.nodcut.com. A new site costs 15 000 so'm with Payme and stays live for one year; updating a live site the user owns costs 4 NodCut credits and keeps its end date. Use when the user wants to deploy, publish, host or put online a website or landing page. Usage: /nodcut:deploy [name] [site folder]."
+description: "Publish a static website (HTML, CSS, JS, images) the user built to its own address, https://<name>.nodcut.com. A new site is one year for 15 000 so'm with Payme, or 60 NodCut credits when the user has them; updating a live site the user owns costs 4 credits and keeps its end date. Use when the user wants to deploy, publish, host or put online a website or landing page. Usage: /nodcut:deploy [name] [site folder]."
 argument-hint: "[name] [site folder]"
 ---
 
@@ -15,12 +15,13 @@ Arguments: `$ARGUMENTS`. They may hold the name, the site folder, both or neithe
 
 ## Two ways to publish
 1. **The NodCut connector (preferred).** Use it when its tools are available: `check_site_name`, `publish_site`, `get_publish_status`, `list_my_sites`. It works everywhere, in chat, Cowork and Claude Code:
-   1. Pick the name (section 2), and check it with `check_site_name`
-   2. Call `publish_site` with every file of the site: `index.html` at the top, plus CSS, JS, other pages and images. Use paths from the site root, text as `utf8` and binary files as `base64`. Pass the user's `language` (`uz`, `ru` or `en`)
-   3. If the answer has a `pay_url`, give it to the user exactly as returned, with the amount it shows (15 000 so'm for a new site or a renewal, 12 500 so'm for 50 credits when an update finds the balance short). An update paid from the balance has no `pay_url`: tell the user how many credits were taken and how many are left
-   4. Call `get_publish_status` with `wait_seconds: 20`, again and again, until it says `published`. Then give the address and the end of the paid year
-   5. If a tool says the user isn't connected, tell them to connect NodCut: click Connect, then Allow on the NodCut page that opens
-   6. If the site is over 4 MB, or has photos you can't send as base64, use the second way instead, when you can run commands
+   1. Pick the name (section 2), and check it with `check_site_name`. It also gives the user's NodCut credit balance
+   2. Tell the user the price and how it will be paid. When the balance covers it (60 credits for a year, 4 for an update), the credits are taken at once with no payment page, so say how many will be taken and how many will be left, and wait for their yes
+   3. Call `publish_site` with every file of the site: `index.html` at the top, plus CSS, JS, other pages and images. Use paths from the site root, text as `utf8` and binary files as `base64`. Pass the user's `language` (`uz`, `ru` or `en`)
+   4. If the answer has a `pay_url`, give it to the user exactly as returned, with the amount it shows (15 000 so'm for a year, 12 500 so'm for 50 credits when an update finds the balance short). A deploy paid from the balance has no `pay_url`: tell the user how many credits were taken and how many are left
+   5. Call `get_publish_status` with `wait_seconds: 20`, again and again, until it says `published`. Then give the address and the end of the paid year
+   6. If a tool says the user isn't connected, tell them to connect NodCut: click Connect, then Allow on the NodCut page that opens
+   7. If the site is over 4 MB, or has photos you can't send as base64, use the second way instead, when you can run commands
 2. **Commands, in Claude Code only.** Use them when the connector isn't available or the site is too big for it. Sections 3–5 below run with the Bash tool, using `curl` and `tar`, which macOS, Linux and Windows 10+ all have. Set the Bash timeout to 600000 ms on the commands that wait.
 
 ## 1. Find the site
@@ -55,10 +56,11 @@ If publishing answers `unsafe_content`, read its message, fix the file it names,
 - If no name was given, suggest one from the project and ask the user to confirm it
 - **Rules:** 3–40 characters, lowercase `a-z`, `0-9` and `-`, with no `-` at the start or end. Names that look like a bank, a payment service or NodCut (`payme`, `click`, `bank`, `login`…) are refused
 - **Updating:** deploying again to a live site the user owns is an update. It replaces the files, keeps the end date, and costs 4 NodCut credits from their balance with no payment page. When the balance has fewer than 4, the answer has a Payme link for 50 credits (12 500 so'm); the update goes out once that is paid, and the other 46 credits stay on the balance
-- **Renewing:** only when the user asks for another year, add `"renew":true` to the deploy (section 3). It costs 15 000 so'm and adds a year from the current end date
+- **Renewing:** only when the user asks for another year, add `"renew":true` to the deploy (section 3). It costs 15 000 so'm (or 60 credits) and adds a year from the current end date
+- **Paid from credits:** whenever the user's NodCut balance holds the price (60 credits for a year, 4 for an update), it is taken at once and publishing starts with no payment page. Say so and get the user's yes before deploying
 
 ## 3. Deploy
-Tell the user the price first: 15 000 so'm with Payme for a new site or a renewal (a year), or 4 NodCut credits for an update of their live site. Then run this one command with SITE, NAME and LANG filled in. For a renewal, change `"archive":true` to `"archive":true,"renew":true`. LANG is `uz`, `ru` or `en`, matching the user's language, for the Payme page:
+Tell the user the price first: a year (a new site or a renewal) is 15 000 so'm with Payme, or 60 NodCut credits taken at once when their balance holds them; an update of their live site is 4 credits. Get their yes before running it when credits will be taken. Then run this one command with SITE, NAME and LANG filled in. For a renewal, change `"archive":true` to `"archive":true,"renew":true`. LANG is `uz`, `ru` or `en`, matching the user's language, for the Payme page:
 
 ```bash
 T=~/.config/nodcut/token; A=https://api.nodcut.com/sites; F="${TMPDIR:-/tmp}/nodcut-site.tar.gz"; SITE="SITE"
@@ -82,7 +84,7 @@ What the output means:
 - **`HTTP 409` with `name_taken`:** the name belongs to someone else or is reserved. Ask for another one
 - **`HTTP 400` / `413`:** show the `message`. Common causes: no `index.html` at the top of SITE, or the site is over 100 MB
 - **Ends with `pay_url` and `HTTP 200`:** the files are uploaded, and the Payme page has opened in the browser. Tell the user to pay the `amount_uzs` shown there (15 000 so'm for a year, or 12 500 so'm for 50 credits when an update found the balance short). Also give them the `pay_url` link from the output, copied exactly, in case the page didn't open. Keep the `DEPLOY_ID`
-- **`"state":"paid"` and `HTTP 200`, no `pay_url`:** an update, paid from the balance. Tell the user `cost_credits` credits were taken and `balance` are left, then go to section 4 with the `DEPLOY_ID`
+- **`"state":"paid"` and `HTTP 200`, no `pay_url`:** paid from the balance (an update, or a year when the balance held 60 credits). Tell the user `cost_credits` credits were taken and `balance` are left, then go to section 4 with the `DEPLOY_ID`
 
 ## 4. Wait until it's live
 Run this with DEPLOY_ID filled in and the Bash timeout at 600000 ms. It waits up to about 9 minutes:

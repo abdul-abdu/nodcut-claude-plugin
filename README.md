@@ -2,9 +2,10 @@
 
 Publish the website you just built with Claude to its own address, **`https://<name>.nodcut.com`**, in one step. Ask Claude to "deploy this site", or run `/nodcut:deploy`. Claude finds or builds the site, uploads it and shows a Payme link. Once you pay, the site is live.
 
-- **Price:** 15 000 so'm for a new site, paid with Payme. The site stays live for one year.
+- **Price:** 15 000 so'm for a new site, paid with Payme, or 60 NodCut credits if your balance has them. The site stays live for one year.
 - **Updates:** deploying again to your live site replaces it for 4 NodCut credits (about 1 000 so'm) and keeps its end date. With too few credits, Claude gives a Payme link for 50 credits (12 500 so'm) first.
-- **Another year:** ask Claude to renew; 15 000 so'm adds a year.
+- **Another year:** ask Claude to renew; 15 000 so'm (or 60 credits) adds a year.
+- **Credits first:** whenever your balance covers the price, Claude asks you, then takes the credits with no payment page.
 - **Account:** your NodCut account. Sign in with Telegram or Google at [app.nodcut.com](https://app.nodcut.com).
 - **Sites:** static only (HTML, CSS, JavaScript, images, fonts). Nothing runs on a server.
 

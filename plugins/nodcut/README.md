@@ -1,8 +1,8 @@
 # nodcut: publish a website from Claude Code
 
 Build a website with Claude, then publish it to its own address, `https://<name>.nodcut.com`.
-A new site costs 15 000 so'm, paid with Payme, and stays live for one year.
-Updating it later costs 4 NodCut credits (about 1 000 so'm) and keeps its end date; another year is 15 000 so'm.
+A new site is one year for 15 000 so'm with Payme, or 60 NodCut credits if you have them.
+Updating it later costs 4 credits (about 1 000 so'm) and keeps its end date; another year is 15 000 so'm or 60 credits.
 
 ## Install
 ```
@@ -29,7 +29,7 @@ The plugin is instructions for Claude (`skills/*/SKILL.md`) plus one remote conn
 - **Connecting:** standard OAuth. You sign in on `app.nodcut.com` and click Allow. Claude then holds your NodCut session (valid 30 days) to call the connector's tools
 - **Tools:**
   - `check_site_name`: sends a name
-  - `publish_site`: sends the site's files, the name and your language, and returns the Payme link (or, for an update paid from your credits, none)
+  - `publish_site`: sends the site's files, the name and your language, and returns the Payme link (or none, when it was paid from your credits)
   - `get_publish_status`: sends a deploy id
   - `list_my_sites`: sends nothing
 - **Never sent:** the connector never sees your other chats, files or photos, only what Claude passes to these tools
