@@ -1,6 +1,6 @@
 ---
 name: deploy
-description: "Publish a static website (HTML, CSS, JS, images) the user built to its own address, https://<name>.nodcut.com. The user pays 15 000 so'm with Payme for each deploy, and the site stays live for one year. Use when the user wants to deploy, publish, host or put online a website or landing page. Usage: /nodcut:deploy [name] [site folder]."
+description: "Publish a static website (HTML, CSS, JS, images) the user built to its own address, https://<name>.nodcut.com. A new site costs 15 000 so'm with Payme and stays live for one year; updating a live site the user owns costs 4 NodCut credits and keeps its end date. Use when the user wants to deploy, publish, host or put online a website or landing page. Usage: /nodcut:deploy [name] [site folder]."
 argument-hint: "[name] [site folder]"
 ---
 
@@ -17,7 +17,7 @@ Arguments: `$ARGUMENTS`. They may hold the name, the site folder, both or neithe
 1. **The NodCut connector (preferred).** Use it when its tools are available: `check_site_name`, `publish_site`, `get_publish_status`, `list_my_sites`. It works everywhere, in chat, Cowork and Claude Code:
    1. Pick the name (section 2), and check it with `check_site_name`
    2. Call `publish_site` with every file of the site: `index.html` at the top, plus CSS, JS, other pages and images. Use paths from the site root, text as `utf8` and binary files as `base64`. Pass the user's `language` (`uz`, `ru` or `en`)
-   3. Give the user the `pay_url` exactly as returned, and tell them it costs 15 000 so'm, paid on Payme
+   3. If the answer has a `pay_url`, give it to the user exactly as returned, with the amount it shows (15 000 so'm for a new site or a renewal, 12 500 so'm for 50 credits when an update finds the balance short). An update paid from the balance has no `pay_url`: tell the user how many credits were taken and how many are left
    4. Call `get_publish_status` with `wait_seconds: 20`, again and again, until it says `published`. Then give the address and the end of the paid year
    5. If a tool says the user isn't connected, tell them to connect NodCut: click Connect, then Allow on the NodCut page that opens
    6. If the site is over 4 MB, or has photos you can't send as base64, use the second way instead, when you can run commands
@@ -54,10 +54,11 @@ If publishing answers `unsafe_content`, read its message, fix the file it names,
 - The address will be `https://<name>.nodcut.com`
 - If no name was given, suggest one from the project and ask the user to confirm it
 - **Rules:** 3–40 characters, lowercase `a-z`, `0-9` and `-`, with no `-` at the start or end. Names that look like a bank, a payment service or NodCut (`payme`, `click`, `bank`, `login`…) are refused
-- Deploying again to a name the user already owns replaces that site and adds a year
+- **Updating:** deploying again to a live site the user owns is an update. It replaces the files, keeps the end date, and costs 4 NodCut credits from their balance with no payment page. When the balance has fewer than 4, the answer has a Payme link for 50 credits (12 500 so'm); the update goes out once that is paid, and the other 46 credits stay on the balance
+- **Renewing:** only when the user asks for another year, add `"renew":true` to the deploy (section 3). It costs 15 000 so'm and adds a year from the current end date
 
 ## 3. Deploy
-Tell the user it costs 15 000 so'm, paid with Payme, and keeps the site live for a year. Then run this one command with SITE, NAME and LANG filled in. LANG is `uz`, `ru` or `en`, matching the user's language, for the Payme page:
+Tell the user the price first: 15 000 so'm with Payme for a new site or a renewal (a year), or 4 NodCut credits for an update of their live site. Then run this one command with SITE, NAME and LANG filled in. For a renewal, change `"archive":true` to `"archive":true,"renew":true`. LANG is `uz`, `ru` or `en`, matching the user's language, for the Payme page:
 
 ```bash
 T=~/.config/nodcut/token; A=https://api.nodcut.com/sites; F="${TMPDIR:-/tmp}/nodcut-site.tar.gz"; SITE="SITE"
@@ -80,7 +81,8 @@ What the output means:
 - **`NOT_SIGNED_IN`, or `HTTP 401` / `HTTP 403`:** sign in (section 5), then run the command again
 - **`HTTP 409` with `name_taken`:** the name belongs to someone else or is reserved. Ask for another one
 - **`HTTP 400` / `413`:** show the `message`. Common causes: no `index.html` at the top of SITE, or the site is over 100 MB
-- **Ends with `pay_url` and `HTTP 200`:** the files are uploaded, and the Payme page has opened in the browser. Tell the user to pay 15 000 so'm there. Also give them the `pay_url` link from the output, copied exactly, in case the page didn't open. Keep the `DEPLOY_ID`
+- **Ends with `pay_url` and `HTTP 200`:** the files are uploaded, and the Payme page has opened in the browser. Tell the user to pay the `amount_uzs` shown there (15 000 so'm for a year, or 12 500 so'm for 50 credits when an update found the balance short). Also give them the `pay_url` link from the output, copied exactly, in case the page didn't open. Keep the `DEPLOY_ID`
+- **`"state":"paid"` and `HTTP 200`, no `pay_url`:** an update, paid from the balance. Tell the user `cost_credits` credits were taken and `balance` are left, then go to section 4 with the `DEPLOY_ID`
 
 ## 4. Wait until it's live
 Run this with DEPLOY_ID filled in and the Bash timeout at 600000 ms. It waits up to about 9 minutes:
@@ -90,7 +92,7 @@ T=~/.config/nodcut/token; for i in $(seq 1 270); do r=$(curl -sS "https://api.no
 ```
 
 What the `state` means:
-- **`published`:** give the user the `url` (`https://<name>.nodcut.com`) and the date in `expires_at`, the end of the paid year. The first visit can take a minute
+- **`published`:** give the user the `url` (`https://<name>.nodcut.com`) and the date in `expires_at`, the end of the paid year (unchanged by an update). The first visit can take a minute
 - **Still `awaiting_payment`:** the payment hasn't arrived. Ask whether they paid, then run the wait again
 - **`cancelled`:** the payment was cancelled or timed out. Offer to deploy again for a new link
 - **`failed`:** show the `error`. Any credits taken were returned to their NodCut balance

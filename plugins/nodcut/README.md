@@ -1,8 +1,8 @@
 # nodcut: publish a website from Claude Code
 
 Build a website with Claude, then publish it to its own address, `https://<name>.nodcut.com`.
-Each deploy costs 15 000 so'm, paid with Payme, and the site stays live for one year.
-Deploying the same name again replaces the site and starts a new year.
+A new site costs 15 000 so'm, paid with Payme, and stays live for one year.
+Updating it later costs 4 NodCut credits (about 1 000 so'm) and keeps its end date; another year is 15 000 so'm.
 
 ## Install
 ```
@@ -29,7 +29,7 @@ The plugin is instructions for Claude (`skills/*/SKILL.md`) plus one remote conn
 - **Connecting:** standard OAuth. You sign in on `app.nodcut.com` and click Allow. Claude then holds your NodCut session (valid 30 days) to call the connector's tools
 - **Tools:**
   - `check_site_name`: sends a name
-  - `publish_site`: sends the site's files, the name and your language, and returns the Payme link
+  - `publish_site`: sends the site's files, the name and your language, and returns the Payme link (or, for an update paid from your credits, none)
   - `get_publish_status`: sends a deploy id
   - `list_my_sites`: sends nothing
 - **Never sent:** the connector never sees your other chats, files or photos, only what Claude passes to these tools
@@ -46,7 +46,7 @@ The plugin is instructions for Claude (`skills/*/SKILL.md`) plus one remote conn
 
 **Opened in your browser** (the links are also shown):
 - **Sign-in:** `https://app.nodcut.com/cli?code=…`, where you sign in with Telegram or Google and click Allow
-- **Payment:** the Payme checkout page (`https://checkout.paycom.uz/…`) for 15 000 so'm. You pay there yourself, and the plugin never sees card details
+- **Payment:** the Payme checkout page (`https://checkout.paycom.uz/…`): 15 000 so'm for a site's year, or 12 500 so'm for 50 credits when an update finds your balance short. You pay there yourself, and the plugin never sees card details
 
 **Stored on your computer:** your NodCut session token in `~/.config/nodcut/token`, readable only by you. Run `/nodcut:login logout` to delete it.
 

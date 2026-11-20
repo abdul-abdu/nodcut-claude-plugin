@@ -36,7 +36,8 @@ Allowing hands the CLI the approving browser's own 30-day session token (`Bearer
 ## Deploys
 
 ### `POST /deploys` (auth): the whole site as one archive (what the plugin uses)
-`{ name, archive: true }`
+`{ name, archive: true, renew? }`
+- `renew: true`: for a live site the caller owns, another year (15 000 so'm) instead of an update
 → `201 { deploy_id, upload: { url, headers } }`
 - `url`: one presigned `PUT` for the site as a `.tar.gz`, sent with `Content-Type: application/gzip`. The archive may hold the site's files at its top, or under one folder
 - On `/uploaded`, the server unpacks it and skips hidden files and folders and `node_modules`. It then checks the files as below (`no_index`, `too_large`, `invalid_files`)
@@ -55,12 +56,17 @@ Errors:
 
 ### `POST /deploys/{id}/uploaded` (auth), body `{ lang? }` (`uz` by default, for the Payme page)
 Before the payment opens, every text file is checked. Fields for card numbers, CVV or SMS codes, a password field on a page naming a bank or payment service, and secrets (bot tokens, API keys, private keys) are refused with `400 { error: "unsafe_content", message, file, reason }`, where `reason` is `card_fields`, `password_phishing` or `secret`
-The server checks that every file is in staging, then opens a Payme order (`kind: "site"`).
-→ `200 { pay_url, amount_uzs, order_id, files }` (`files`: how many files will be published)
+The server checks that every file is in staging, then decides what the deploy is:
+- **`publish`:** a new site, or a name whose site expired. Opens a Payme order for the `site` pack (15 000 so'm, a year)
+- **`renew`:** `renew: true` on a live site the caller owns. The same order; the year is added to the current end
+- **`update`:** a live site the caller owns. Takes `cost_credits` (4) from the NodCut balance at once and starts publishing; the end date stays. When the balance is short, opens a Payme order for the `basic` pack (50 credits, 12 500 so'm) and spends the 4 once it is paid
+
+→ `200 { kind, pay_url, amount_uzs, order_id, cost_credits, pack_credits?, files }` while a payment is due (`files`: how many files will be published)
+→ `200 { kind: "update", state: "paid", cost_credits, balance, files }` for an update paid from the balance
 - `400 missing_files { message, files: [...] }`
 
 ### `GET /deploys/{id}` (auth)
-→ `200 { deploy_id, name, state, url?, expires_at?, error? }`
+→ `200 { deploy_id, name, state, kind?, url?, expires_at?, error? }`
 
 `state`:
 - `uploading`
