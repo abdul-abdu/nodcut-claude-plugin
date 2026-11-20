@@ -1,7 +1,7 @@
 {
   "name": "nodcut",
   "displayName": "NodCut",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Publish the websites you make with Claude to <name>.nodcut.com. 15 000 so'm per publish with Payme, live for one year.",
   "author": {
     "name": "NodCut",

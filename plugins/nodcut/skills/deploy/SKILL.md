@@ -27,16 +27,33 @@ Arguments: `$ARGUMENTS`. They may hold the name, the site folder, both or neithe
 In chat, the site is the files you just wrote (HTML, CSS, JS) for the user.
 In Claude Code or Cowork, it is a folder. The site must be static: files a browser opens without a server.
 - **Needs a server** (API routes, server-side rendering, PHP, a database): say nodcut.com hosts only static sites, and stop. If the framework has a static export, offer it (Next.js: `output: "export"`)
+- **Only needs forms or saved data** (RSVPs, orders, contact forms, guest books, likes, votes): that works on a static site. Follow the `forms` skill, and publish its `nodcut.json` with the other files
 - **Has a build step:** if `package.json` has a `build` script and there is no fresh build output, run the build with the project's package manager
 - **The site folder** is the folder with `index.html` at its top: usually `dist/`, `build/`, `out/` or `_site/`, or the project folder itself for a hand-written site
 - **Never the source:** never pick `src/`, or the whole repo, when a build output exists
 
 Use the folder's absolute path below as SITE.
 
+## Before publishing: the safety check
+Check the site, fix what you find yourself, and tell the user in one short line what you fixed:
+1. **No secrets:** every file of a site is public. No API keys, bot tokens, passwords or private keys in HTML or JavaScript
+2. **No payment or login details:** no fields for card numbers, CVV, SMS codes, or passwords of other services. Payments go through the owner's own Payme or Click page. NodCut refuses such sites
+3. **Visitor text** (form entries, URL parameters) goes on the page with `textContent`, never `innerHTML`
+4. **Scripts:** only from well-known CDNs (cdnjs, jsdelivr, unpkg) with a pinned version, and no `eval`
+5. **Links:** links to other sites use `https://` and `target="_blank" rel="noopener"`
+6. **No private data in the files:** no customer lists, phone numbers or ID documents
+7. **Forms** follow the `forms` skill: honeypot, `_next`, and private fields never public
+8. **Content-Security-Policy:** add this `<meta>` to every page's `<head>`, and widen it only for what the site really uses:
+   ```html
+   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; media-src 'self' https:; connect-src 'self' https://api.nodcut.com; frame-src https://www.youtube.com https://www.google.com; form-action 'self' https://api.nodcut.com">
+   ```
+
+If publishing answers `unsafe_content`, read its message, fix the file it names, and publish again.
+
 ## 2. Pick the name
 - The address will be `https://<name>.nodcut.com`
 - If no name was given, suggest one from the project and ask the user to confirm it
-- **Rules:** 3–40 characters, lowercase `a-z`, `0-9` and `-`, with no `-` at the start or end
+- **Rules:** 3–40 characters, lowercase `a-z`, `0-9` and `-`, with no `-` at the start or end. Names that look like a bank, a payment service or NodCut (`payme`, `click`, `bank`, `login`…) are refused
 - Deploying again to a name the user already owns replaces that site and adds a year
 
 ## 3. Deploy

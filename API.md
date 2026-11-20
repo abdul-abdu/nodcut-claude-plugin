@@ -54,6 +54,7 @@ Errors:
 - `401 unauthorized`
 
 ### `POST /deploys/{id}/uploaded` (auth), body `{ lang? }` (`uz` by default, for the Payme page)
+Before the payment opens, every text file is checked. Fields for card numbers, CVV or SMS codes, a password field on a page naming a bank or payment service, and secrets (bot tokens, API keys, private keys) are refused with `400 { error: "unsafe_content", message, file, reason }`, where `reason` is `card_fields`, `password_phishing` or `secret`
 The server checks that every file is in staging, then opens a Payme order (`kind: "site"`).
 → `200 { pay_url, amount_uzs, order_id, files }` (`files`: how many files will be published)
 - `400 missing_files { message, files: [...] }`
@@ -74,4 +75,24 @@ Publishing runs when the order is paid. `GET` also starts it if it hasn't run ye
 ## Sites
 
 ### `GET /sites` (auth)
-→ `200 { sites: [{ name, url, state, expires_at, updated_at }] }`
+→ `200 { sites: [{ name, url, state, expires_at, updated_at, entries }] }` (`entries`: form entries stored)
+
+## Forms (https://api.nodcut.com/forms, no auth, any origin)
+What a published site's own pages call. The `forms` skill has the rules and `nodcut.json`.
+
+### `POST /forms/{site}/{form}`, body: a JSON object (any Content-Type) or a urlencoded HTML form
+→ `200 { ok: true, count, limit?, left? }`. A plain HTML form gets `303` back to its page with `?sent=1` or `?error=<code>`
+Errors: `invalid_field` 400 (`field`), `invalid_request` 400, `not_found` 404, `form_full` 409, `too_large` 413, `rate_limited` 429
+
+### `GET /forms/{site}/{form}?limit=`
+→ `200 { form, count, limit?, left?, choices?: { field: { value: count } }, entries?: [{ at, fields }] }`
+
+## Entries (https://api.nodcut.com/sites, auth, the site's owner only)
+
+### `GET /sites/{name}/entries?form=&cursor=`
+→ `200 { site, forms: [{ name, count, last }], form, entries: [{ id, form, at, fields, done }], cursor? }` (`form`: the given one, else the most recently used)
+
+### `POST /sites/{name}/entries/{form}/{id}/done`, body `{ done }` → `204`
+### `DELETE /sites/{name}/entries/{form}/{id}` → `204`
+### `GET /sites/{name}/export?form=` → `200 text/csv`
+### `POST /sites/{name}/export`, body `{ form }` → `200 { sent: true, count }`: @NodCutBot sends the CSV to the owner's Telegram chat

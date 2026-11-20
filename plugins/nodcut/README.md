@@ -14,9 +14,10 @@ Deploying the same name again replaces the site and starts a new year.
 - **`/nodcut:deploy [name] [folder]`:** builds the site if needed, uploads it, shows the Payme link, then waits until the site is live. You can also just say "deploy this site"
 - **`/nodcut:login`:** signs in with your NodCut account (Telegram or Google) in the browser. `/nodcut:login status` shows who is signed in, and `/nodcut:login logout` signs out
 - **`/nodcut:sites`:** lists your sites and the date each is paid until
+- **`/nodcut:forms [what for]`:** adds a form or saved data to a site: RSVPs, orders, contact forms, guest books, likes, votes. Each entry reaches you on Telegram and in the NodCut app
 
 ## Good to know
-- Only static sites are supported: HTML, CSS, JS and images. Nothing runs on a server
+- Only static sites are supported: HTML, CSS, JS and images. Nothing runs on a server. Forms and saved data still work, through NodCut's forms API (see the `forms` skill)
 - **Works everywhere through the NodCut connector:** Claude chat (web, desktop, mobile), Cowork and Claude Code. The first time, Claude asks you to connect NodCut. A NodCut page opens, where you sign in with Telegram or Google and click Allow
 - **Big sites from Claude Code:** sites over 4 MB, or with many photos, can also be published from Claude Code without the connector. Claude runs `curl` and `tar` (built into macOS, Linux and Windows 10+) and asks your permission first
 - The service is run by NodCut (nodcut.com), not by Anthropic
