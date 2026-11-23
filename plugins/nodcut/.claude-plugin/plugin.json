@@ -1,8 +1,8 @@
 {
   "name": "nodcut",
   "displayName": "NodCut",
-  "version": "0.6.0",
-  "description": "Publish the websites you make with Claude to <name>.nodcut.com. a year for 15 000 so'm with Payme or 60 NodCut credits; updates for 4 credits.",
+  "version": "0.6.1",
+  "description": "Publish the websites you make with Claude at your own address, <name>.nodcut.com.",
   "author": {
     "name": "NodCut",
     "url": "https://nodcut.com"

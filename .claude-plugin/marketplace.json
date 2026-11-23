@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "nodcut",
-      "description": "Publish a static website to <name>.nodcut.com. 15 000 so'm per deploy with Payme, live for one year.",
+      "description": "Publish the websites you make with Claude at your own address, <name>.nodcut.com.",
       "category": "deployment",
       "source": "./plugins/nodcut"
     }
